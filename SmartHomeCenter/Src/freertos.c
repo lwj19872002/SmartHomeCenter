@@ -60,6 +60,8 @@
 #include "stm32f4xx.h"
 
 #include "OLED_I2C.h"
+
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,7 +81,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+static uint8_t uacBuff[128];
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 
@@ -139,15 +141,21 @@ void StartDefaultTask(void const * argument)
 {
 
   /* USER CODE BEGIN StartDefaultTask */
+	uint8_t flag = 0;
+
 	OLED_Init();
 	OLED_Fill(0x00);
 
 	OLED_ShowStr(0, 2, "Hello word!", 2);
+	OLED_ShowStr(0, 0, "Time:", 2);
   /* Infinite loop */
   for(;;)
   {
     osDelay(1000);
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+    OLED_ShowStr(45, 0, "    ", 2);
+    sprintf(uacBuff, "%d", flag++);
+    OLED_ShowStr(45, 0, uacBuff, 2);
   }
   /* USER CODE END StartDefaultTask */
 }
