@@ -1,0 +1,7 @@
+/SmartHomeCenter/Drivers/CMSIS/*.o
+/SmartHomeCenter/Drivers/STM32F4xx_HAL_Driver/*.o
+/SmartHomeCenter/SmartHomeCenter.ioc
+/SmartHomeCenter/*.out
+/SmartHomeCenter/*.sim
+/SmartHomeCenter/Src/*.o
+/CSpyServer.log
