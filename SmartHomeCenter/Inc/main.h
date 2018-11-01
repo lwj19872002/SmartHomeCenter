@@ -60,6 +60,12 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define DOORSIDE_INT_Pin GPIO_PIN_1
+#define DOORSIDE_INT_GPIO_Port GPIOA
+#define DOORSIDE_INT_EXTI_IRQn EXTI1_IRQn
+#define ROOMSIDE_INT_Pin GPIO_PIN_4
+#define ROOMSIDE_INT_GPIO_Port GPIOA
+#define ROOMSIDE_INT_EXTI_IRQn EXTI4_IRQn
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
 

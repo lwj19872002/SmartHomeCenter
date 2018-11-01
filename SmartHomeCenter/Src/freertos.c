@@ -58,9 +58,8 @@
 /* USER CODE BEGIN Includes */     
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
-
-#include "OLED_I2C.h"
-
+#include "HumanInterface.h"
+#include "BodySensor.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -84,6 +83,7 @@
 static uint8_t uacBuff[128];
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
+osThreadId mainTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -91,6 +91,7 @@ osThreadId defaultTaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
+void StartMainTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -121,6 +122,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of mainTask */
+  osThreadDef(mainTask, StartMainTask, osPriorityHigh, 0, 128);
+  mainTaskHandle = osThreadCreate(osThread(mainTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -143,21 +148,57 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
 	uint8_t flag = 0;
 
-	OLED_Init();
-	OLED_Fill(0x00);
-
-	OLED_ShowStr(0, 2, "Hello word!", 2);
-	OLED_ShowStr(0, 0, "Time:", 2);
   /* Infinite loop */
   for(;;)
   {
     osDelay(1000);
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-    OLED_ShowStr(45, 0, "    ", 2);
-    sprintf(uacBuff, "%d", flag++);
-    OLED_ShowStr(45, 0, uacBuff, 2);
+    sprintf((char *)uacBuff, "%d", ++flag);
+    HI_ShowStrEN(0, 0, uacBuff, 2, 3);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* USER CODE BEGIN Header_StartMainTask */
+/**
+* @brief Function implementing the mainTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartMainTask */
+void StartMainTask(void const * argument)
+{
+  /* USER CODE BEGIN StartMainTask */
+	X_BODYSS_INFO *pInfo;
+
+	HI_Init();
+	HI_ShowStrEN(0, 2, "D:", 2, 1);
+	HI_ShowStrEN(32, 2, "R:", 2, 1);
+	BodySS_Init();
+	pInfo = BodySS_GetInfo();
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(500);
+    if(pInfo->eDSStatus == eHigh)
+    {
+    	HI_ShowStrEN(16, 2, "H", 2, 1);
+    }
+    else
+    {
+    	HI_ShowStrEN(16, 2, "L", 2, 1);
+    }
+
+    if(pInfo->eRSStatus == eHigh)
+    {
+    	HI_ShowStrEN(48, 2, "H", 2, 1);
+    }
+    else
+    {
+    	HI_ShowStrEN(48, 2, "L", 2, 1);
+    }
+  }
+  /* USER CODE END StartMainTask */
 }
 
 /* Private application code --------------------------------------------------*/
