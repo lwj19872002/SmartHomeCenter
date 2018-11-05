@@ -80,7 +80,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-static uint8_t uacBuff[128];
+
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId mainTaskHandle;
@@ -146,15 +146,12 @@ void StartDefaultTask(void const * argument)
 {
 
   /* USER CODE BEGIN StartDefaultTask */
-	uint8_t flag = 0;
 
   /* Infinite loop */
   for(;;)
   {
     osDelay(1000);
     HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-    sprintf((char *)uacBuff, "%d", ++flag);
-    HI_ShowStrEN(0, 0, uacBuff, 2, 3);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -174,6 +171,7 @@ void StartMainTask(void const * argument)
 	HI_Init();
 	HI_ShowStrEN(0, 2, "D:", 2, 1);
 	HI_ShowStrEN(32, 2, "R:", 2, 1);
+
 	BodySS_Init();
 	pInfo = BodySS_GetInfo();
   /* Infinite loop */
