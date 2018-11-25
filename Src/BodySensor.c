@@ -7,6 +7,7 @@
 #include "stm32f4xx.h"
 #include "gpio.h"
 #include "BodySensor.h"
+#include "HumanInterface.h"
 
 // 人体出门判断时，两个传感器激活时间差阈值，目前为10秒
 #define BODYSS_TIMEOUT_THR 100000

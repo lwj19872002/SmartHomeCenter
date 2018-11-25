@@ -60,6 +60,7 @@
 #include "stm32f4xx.h"
 #include "HumanInterface.h"
 #include "BodySensor.h"
+#include "Media.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
@@ -172,6 +173,8 @@ void StartMainTask(void const * argument)
 	HI_ShowStrEN(0, 2, "D:", 2, 1);
 	HI_ShowStrEN(32, 2, "R:", 2, 1);
 
+	Media_init();
+
 	BodySS_Init();
 	pInfo = BodySS_GetInfo();
   /* Infinite loop */
@@ -195,6 +198,12 @@ void StartMainTask(void const * argument)
     {
     	HI_ShowStrEN(48, 2, "L", 2, 1);
     }
+
+    if(BodySS_IsHumanOut())
+    {
+    	Media_Start();
+    }
+
   }
   /* USER CODE END StartMainTask */
 }

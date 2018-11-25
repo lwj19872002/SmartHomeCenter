@@ -19,7 +19,7 @@ osTimerDef(HIThreadTimer, HI_ThreadTimerCB);
 
 void HI_ThreadTimerCB(void const *argument)
 {
-  uint8_t c[4];
+  uint8_t uacTemp[4];
 
   if(!gxHIInfo.bShowCD)
   {

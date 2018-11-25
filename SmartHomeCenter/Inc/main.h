@@ -60,6 +60,8 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define MEDIA_CTRL_Pin GPIO_PIN_0
+#define MEDIA_CTRL_GPIO_Port GPIOC
 #define DOORSIDE_INT_Pin GPIO_PIN_1
 #define DOORSIDE_INT_GPIO_Port GPIOA
 #define DOORSIDE_INT_EXTI_IRQn EXTI1_IRQn
