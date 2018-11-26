@@ -39,7 +39,7 @@ inline void Media_Start(void)
 	}
 
 	HAL_GPIO_WritePin(MEDIA_CTRL_GPIO_Port, MEDIA_CTRL_Pin, GPIO_PIN_RESET);
-	osTimerStart(gxMediaPlayTimerID, 20000);
+	osTimerStart(gxMediaPlayTimerID, 30000);
 	gsbIsMediaStart = true;
 }
 
