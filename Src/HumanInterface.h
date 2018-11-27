@@ -9,7 +9,6 @@ typedef struct {
   uint8_t u8CDX;
   uint8_t u8CDY;
   uint8_t u8CDVal;
-
 } X_HI_INFO;
 
 void HI_Init(void);

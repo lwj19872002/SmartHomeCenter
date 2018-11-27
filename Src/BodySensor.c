@@ -9,8 +9,11 @@
 #include "BodySensor.h"
 #include "HumanInterface.h"
 
-// 人体出门判断时，两个传感器激活时间差阈值，目前为10秒
-#define BODYSS_TIMEOUT_THR 100000
+// 人体出门判断时，两个传感器激活时间差高阈值，目前为1秒
+#define BODYSS_TIMEOUT_THR 1000
+// 人体出门判断时，两个传感器激活时间差低阈值，目前为10ms秒
+#define BODYSS_TIMEMIN_THR 10
+
 // 延时60秒再开启中断，等待探头初始化
 #define BODYSS_INIT_DELAY 60000
 
@@ -111,14 +114,17 @@ X_BODYSS_INFO *BodySS_GetInfo(void)
   return &gxBodySSInfo;
 }
 
+// 判断当前状态是否发生人出门动作
 bool BodySS_IsHumanOut(void)
 {
   bool bRet;
   uint32_t u32Tmp;
 
   bRet = false;
+  // 只用当两个传感器都触发的情况下才判断状态
   if ((gxBodySSInfo.eDSStatus == eHigh) && (gxBodySSInfo.eRSStatus == eHigh))
   {
+    // 计算出发时间差
     if (gxBodySSInfo.u32RSSTime <= gxBodySSInfo.u32DSSTime)
     {
       u32Tmp = gxBodySSInfo.u32DSSTime - gxBodySSInfo.u32RSSTime;
@@ -128,7 +134,8 @@ bool BodySS_IsHumanOut(void)
       u32Tmp = UINT32_MAX - gxBodySSInfo.u32RSSTime + gxBodySSInfo.u32DSSTime;
     }
 
-    if (u32Tmp < BODYSS_TIMEOUT_THR)
+    // 判断时间
+    if ((u32Tmp < BODYSS_TIMEOUT_THR) && (u32Tmp > BODYSS_TIMEMIN_THR))
     {
       bRet = true;
     }
@@ -137,6 +144,7 @@ bool BodySS_IsHumanOut(void)
   return bRet;
 }
 
+// 判断当前状态是否出现人进门动作
 bool BodySS_IsHumanIn(void)
 {
   bool bRet;
@@ -154,7 +162,7 @@ bool BodySS_IsHumanIn(void)
       u32Tmp = UINT32_MAX - gxBodySSInfo.u32DSSTime + gxBodySSInfo.u32RSSTime;
     }
 
-    if (u32Tmp < BODYSS_TIMEOUT_THR)
+    if ((u32Tmp < BODYSS_TIMEOUT_THR) && (u32Tmp > BODYSS_TIMEMIN_THR))
     {
       bRet = true;
     }

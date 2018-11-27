@@ -23,7 +23,6 @@ void Media_init(void)
 {
 	gsbIsMediaStart = false;
 	gxMediaPlayTimerID = osTimerCreate(osTimer(MediaPlayTimer), osTimerOnce, NULL);
-	//osTimerStart(gxMediaPlayTimerID, 20000);
 }
 
 void Media_PlayTimerCallBack(void const *argument)
@@ -46,6 +45,5 @@ inline void Media_Start(void)
 inline void Media_Stop(void)
 {
 	HAL_GPIO_WritePin(MEDIA_CTRL_GPIO_Port, MEDIA_CTRL_Pin, GPIO_PIN_SET);
-
 	gsbIsMediaStart = false;
 }
