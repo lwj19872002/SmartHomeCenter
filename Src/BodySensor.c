@@ -33,10 +33,22 @@ osTimerDef(BodySSInitTimer, BodySS_InitDelayCallBack);
 
 void BodySS_InitDelayCallBack(void const *argument)
 {
+  gxBodySSInfo.eDSStatus = eLow;
+  gxBodySSInfo.u32DSETime = 0;
+  gxBodySSInfo.u32DSSTime = 0;
+
+  gxBodySSInfo.eRSStatus = eLow;
+  gxBodySSInfo.u32RSETime = 0;
+  gxBodySSInfo.u32RSSTime = 0;
+
   LL_EXTI_EnableRisingTrig_0_31(DOORSIDE_INT_LINE);
   LL_EXTI_EnableRisingTrig_0_31(ROOMSIDE_INT_LINE);
   LL_EXTI_DisableFallingTrig_0_31(DOORSIDE_INT_LINE);
   LL_EXTI_DisableFallingTrig_0_31(ROOMSIDE_INT_LINE);
+
+  __HAL_GPIO_EXTI_CLEAR_IT(DOORSIDE_INT_Pin);
+  __HAL_GPIO_EXTI_CLEAR_IT(ROOMSIDE_INT_Pin);
+
   HAL_NVIC_EnableIRQ(DOORSIDE_INT_IRQ);
   HAL_NVIC_EnableIRQ(ROOMSIDE_INT_IRQ);
 }
@@ -89,19 +101,9 @@ void BodySS_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(DOORSIDE_INT_IRQ, 5, 0);
   HAL_NVIC_DisableIRQ(DOORSIDE_INT_IRQ);
-  __HAL_GPIO_EXTI_CLEAR_IT(DOORSIDE_INT_Pin);
 
   HAL_NVIC_SetPriority(ROOMSIDE_INT_IRQ, 5, 0);
   HAL_NVIC_DisableIRQ(ROOMSIDE_INT_IRQ);
-  __HAL_GPIO_EXTI_CLEAR_IT(ROOMSIDE_INT_Pin);
-
-  gxBodySSInfo.eDSStatus = eLow;
-  gxBodySSInfo.u32DSETime = 0;
-  gxBodySSInfo.u32DSSTime = 0;
-
-  gxBodySSInfo.eRSStatus = eLow;
-  gxBodySSInfo.u32RSETime = 0;
-  gxBodySSInfo.u32RSSTime = 0;
 
   gxBodySSInitTimerID = osTimerCreate(osTimer(BodySSInitTimer), osTimerOnce, NULL);
   // 延时开中断，等待探头初始化
