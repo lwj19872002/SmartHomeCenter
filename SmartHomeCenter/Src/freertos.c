@@ -199,6 +199,7 @@ void StartMainTask(void const * argument)
     	HI_ShowStrEN(48, 2, "L", 2, 1);
     }
 
+    BodySS_Thread();
     if(BodySS_IsHumanOut())
     {
     	Media_Start();

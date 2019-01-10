@@ -17,6 +17,9 @@
 // 延时60秒再开启中断，等待探头初始化
 #define BODYSS_INIT_DELAY 60000
 
+// 180秒
+#define BODYSS_BODY_DELAY (2 * 180)
+
 // 门端中断定义
 #define DOORSIDE_INT_IRQ EXTI1_IRQn
 #define DOORSIDE_INT_LINE LL_EXTI_LINE_1
@@ -36,10 +39,14 @@ void BodySS_InitDelayCallBack(void const *argument)
   gxBodySSInfo.eDSStatus = eLow;
   gxBodySSInfo.u32DSETime = 0;
   gxBodySSInfo.u32DSSTime = 0;
+  gxBodySSInfo.eDStatus = eNone;
+  gxBodySSInfo.u32DDelay = 0;
 
   gxBodySSInfo.eRSStatus = eLow;
   gxBodySSInfo.u32RSETime = 0;
   gxBodySSInfo.u32RSSTime = 0;
+  gxBodySSInfo.eRStatus = eNone;
+  gxBodySSInfo.u32RDelay = 0;
 
   LL_EXTI_EnableRisingTrig_0_31(DOORSIDE_INT_LINE);
   LL_EXTI_EnableRisingTrig_0_31(ROOMSIDE_INT_LINE);
@@ -64,6 +71,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       gxBodySSInfo.u32DSSTime = HAL_GetTick();
       LL_EXTI_DisableRisingTrig_0_31(DOORSIDE_INT_LINE);
       LL_EXTI_EnableFallingTrig_0_31(DOORSIDE_INT_LINE);
+
+      gxBodySSInfo.eDStatus = eHaveBody;
+      gxBodySSInfo.u32DDelay = BODYSS_BODY_DELAY;
     }
     else
     {
@@ -84,6 +94,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       gxBodySSInfo.u32RSSTime = HAL_GetTick();
       LL_EXTI_DisableRisingTrig_0_31(ROOMSIDE_INT_LINE);
       LL_EXTI_EnableFallingTrig_0_31(ROOMSIDE_INT_LINE);
+
+      gxBodySSInfo.eRStatus = eHaveBody;
+      gxBodySSInfo.u32RDelay = BODYSS_BODY_DELAY;
     }
     else
     {
@@ -109,11 +122,37 @@ void BodySS_Init(void)
   // 延时开中断，等待探头初始化
   osTimerStart(gxBodySSInitTimerID, BODYSS_INIT_DELAY);
   HI_ShowCountDown(0, 0, (BODYSS_INIT_DELAY / 1000));
+
+  gxBodySSInfo.eDStatus = eNone;
+  gxBodySSInfo.u32DDelay = 0;
+  gxBodySSInfo.eRStatus = eNone;
+  gxBodySSInfo.u32RDelay = 0;
 }
 
 X_BODYSS_INFO *BodySS_GetInfo(void)
 {
   return &gxBodySSInfo;
+}
+
+void BodySS_Thread(void)
+{
+  if((eHaveBody == gxBodySSInfo.eDStatus) && (gxBodySSInfo.u32DDelay > 0))
+  {
+    gxBodySSInfo.u32DDelay--;
+  }
+  else
+  {
+    gxBodySSInfo.eDStatus = eNone;
+  }
+
+  if((eHaveBody == gxBodySSInfo.eRStatus) && (gxBodySSInfo.u32RDelay > 0))
+  {
+    gxBodySSInfo.u32RDelay--;
+  }
+  else
+  {
+    gxBodySSInfo.eRStatus = eNone;
+  }
 }
 
 // 判断当前状态是否发生人出门动作
@@ -123,6 +162,7 @@ bool BodySS_IsHumanOut(void)
   uint32_t u32Tmp;
 
   bRet = false;
+#if 0
   // 只用当两个传感器都触发的情况下才判断状态
   if ((gxBodySSInfo.eDSStatus == eHigh) && (gxBodySSInfo.eRSStatus == eHigh))
   {
@@ -142,6 +182,13 @@ bool BodySS_IsHumanOut(void)
       bRet = true;
     }
   }
+#else
+  // 两个传感器都探测到人算有人出门
+  if((eHaveBody == gxBodySSInfo.eDStatus) && (eHaveBody == gxBodySSInfo.eRStatus))
+  {
+    bRet = true;
+  }
+#endif
 
   return bRet;
 }
@@ -153,6 +200,7 @@ bool BodySS_IsHumanIn(void)
   uint32_t u32Tmp;
 
   bRet = false;
+#if 1
   if ((gxBodySSInfo.eDSStatus == eHigh) && (gxBodySSInfo.eRSStatus == eHigh))
   {
     if (gxBodySSInfo.u32RSSTime >= gxBodySSInfo.u32DSSTime)
@@ -169,6 +217,12 @@ bool BodySS_IsHumanIn(void)
       bRet = true;
     }
   }
+#else
+  if((eHaveBody == gxBodySSInfo.eDStatus) && (eHaveBody == gxBodySSInfo.eRStatus))
+  {
+    bRet = true;
+  }
+#endif
 
   return bRet;
 }
