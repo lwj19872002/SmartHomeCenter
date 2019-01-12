@@ -35,9 +35,9 @@ typedef struct
   uint32_t u32RSSTime;
   // 房端探头变低时的时间
   uint32_t u32RSETime;
-  // 是否当前有人进入门端探测范围
+  // 是否当前有人进入房端探测范围
   E_BODY_STATUS eRStatus;
-  // 门端有人探测延时
+  // 房端有人探测延时
   uint32_t u32RDelay;
 } X_BODYSS_INFO;
 
@@ -46,5 +46,6 @@ X_BODYSS_INFO *BodySS_GetInfo(void);
 bool BodySS_IsHumanOut(void);
 bool BodySS_IsHumanIn(void);
 void BodySS_Thread(void);
+void BodySS_Reset(void);
 
 #endif

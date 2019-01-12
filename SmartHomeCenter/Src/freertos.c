@@ -203,6 +203,7 @@ void StartMainTask(void const * argument)
     if(BodySS_IsHumanOut())
     {
     	Media_Start();
+    	BodySS_Reset();
     }
 
   }

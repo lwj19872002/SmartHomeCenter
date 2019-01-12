@@ -134,6 +134,12 @@ X_BODYSS_INFO *BodySS_GetInfo(void)
   return &gxBodySSInfo;
 }
 
+void BodySS_Reset(void)
+{
+  gxBodySSInfo.u32DDelay = 0;
+  gxBodySSInfo.u32RDelay = 0;
+}
+
 void BodySS_Thread(void)
 {
   if((eHaveBody == gxBodySSInfo.eDStatus) && (gxBodySSInfo.u32DDelay > 0))
@@ -159,7 +165,7 @@ void BodySS_Thread(void)
 bool BodySS_IsHumanOut(void)
 {
   bool bRet;
-  uint32_t u32Tmp;
+  //uint32_t u32Tmp;
 
   bRet = false;
 #if 0
